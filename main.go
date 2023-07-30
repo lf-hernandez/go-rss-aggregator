@@ -20,7 +20,6 @@ type apiConfig struct {
 
 func main() {
 	dotEnvError := godotenv.Load()
-
 	if dotEnvError != nil {
 		log.Fatal("Error loading .env file")
 	}
@@ -31,7 +30,6 @@ func main() {
 	}
 
 	sqlConnection, sqlError := sql.Open("postgres", dbURL)
-
 	if sqlError != nil {
 		log.Fatal("Error connecting to database: ", sqlError)
 	}
@@ -44,8 +42,8 @@ func main() {
 	if portString == "" {
 		log.Fatal("PORT not found")
 	}
-	router := chi.NewRouter()
 
+	router := chi.NewRouter()
 	router.Use(cors.Handler(cors.Options{
 		AllowedOrigins:   []string{"https://*", "http://*"},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
@@ -60,7 +58,9 @@ func main() {
 	v1Router.Get("/healthz", handlerReadiness)
 	v1Router.Get("/error", handlerError)
 	v1Router.Post("/users", apiConfiguration.handlerCreateUser)
-	v1Router.Get("/users", apiConfiguration.handlerGetUser)
+	v1Router.Get("/users", apiConfiguration.middlewareAuth(apiConfiguration.handlerGetUser))
+	v1Router.Post("/feeds", apiConfiguration.middlewareAuth(apiConfiguration.handlerCreateFeed))
+	v1Router.Get("/feeds", apiConfiguration.handlerGetFeeds)
 
 	router.Mount("/v1", v1Router)
 
@@ -70,8 +70,8 @@ func main() {
 	}
 
 	log.Printf("Server starting on port %v", portString)
-	serverError := server.ListenAndServe()
 
+	serverError := server.ListenAndServe()
 	if serverError != nil {
 		log.Fatal(serverError)
 	}
