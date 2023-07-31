@@ -14,7 +14,7 @@ import (
 
 const createUser = `-- name: CreateUser :one
 INSERT INTO users(id, created_at, updated_at, name, api_key)
-values ($1, $2, $3, $4, encode(sha256(random()::text::bytea), 'hex') )
+VALUES ($1, $2, $3, $4, encode(sha256(random()::text::bytea), 'hex') )
 RETURNING id, created_at, updated_at, name, api_key
 `
 
@@ -44,7 +44,9 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 }
 
 const getUserByAPIKey = `-- name: GetUserByAPIKey :one
-SELECT id, created_at, updated_at, name, api_key from users where api_key = $1
+SELECT id, created_at, updated_at, name, api_key
+FROM users
+WHERE api_key = $1
 `
 
 func (q *Queries) GetUserByAPIKey(ctx context.Context, apiKey string) (User, error) {
