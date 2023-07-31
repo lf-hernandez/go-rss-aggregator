@@ -10,23 +10,23 @@ import (
 	"github.com/lf-hernandez/go-rss-aggregator/internal/database"
 )
 
-func (apiConfiguration *apiConfig) handlerCreateFeed(responseWriter http.ResponseWriter, r *http.Request, user database.User) {
+func (apiConfiguration *apiConfig) handlerCreateFeed(responseWriter http.ResponseWriter, request *http.Request, user database.User) {
 	type parameteres struct {
 		Name string `json:"name"`
 		URL  string `json:"url"`
 	}
 
-	decoder := json.NewDecoder(r.Body)
+	decoder := json.NewDecoder(request.Body)
 
 	params := parameteres{}
 	decoderError := decoder.Decode(&params)
 
 	if decoderError != nil {
-		respondWithError(responseWriter, 400, fmt.Sprintf("Error parsing JSON: %v", decoderError))
+		respondWithError(responseWriter, 400, fmt.Sprintln("Error parsing JSON: %v", decoderError))
 		return
 	}
 
-	feed, createFeedError := apiConfiguration.DB.CreateFeed(r.Context(), database.CreateFeedParams{
+	feed, createFeedError := apiConfiguration.DB.CreateFeed(request.Context(), database.CreateFeedParams{
 		ID:        uuid.New(),
 		CreatedAt: time.Now().UTC(),
 		UpdatedAt: time.Now().UTC(),
@@ -36,19 +36,19 @@ func (apiConfiguration *apiConfig) handlerCreateFeed(responseWriter http.Respons
 	})
 
 	if createFeedError != nil {
-		respondWithError(responseWriter, 400, fmt.Sprint("Couldn't create users:, ", createFeedError))
+		respondWithError(responseWriter, 400, fmt.Sprintln("Couldn't create users:, ", createFeedError))
 		return
 	}
 
 	respondWithJSON(responseWriter, 201, databaseFeedToFeed(feed))
 }
 
-func (apiConfiguration *apiConfig) handlerGetFeeds(responseWriter http.ResponseWriter, r *http.Request) {
-	feeds, getFeedsError := apiConfiguration.DB.GetFeeds(r.Context())
+func (apiConfiguration *apiConfig) handlerGetFeeds(responseWriter http.ResponseWriter, request *http.Request) {
+	feeds, getFeedsError := apiConfiguration.DB.GetFeeds(request.Context())
 	if getFeedsError != nil {
-		respondWithError(responseWriter, 400, fmt.Sprint("Couldn't get feeds:, ", getFeedsError))
+		respondWithError(responseWriter, 400, fmt.Sprintln("Couldn't get feeds:, ", getFeedsError))
 		return
 	}
 
-	respondWithJSON(responseWriter, 201, databaseFeedsToFeeds(feeds))
+	respondWithJSON(responseWriter, 200, databaseFeedsToFeeds(feeds))
 }

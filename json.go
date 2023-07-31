@@ -31,3 +31,7 @@ func respondWithError(responseWriter http.ResponseWriter, code int, msg string) 
 
 	respondWithJSON(responseWriter, code, errResponse{Error: msg})
 }
+
+func respondOk(responseWriter http.ResponseWriter) {
+	responseWriter.WriteHeader(200)
+}

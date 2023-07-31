@@ -11,22 +11,22 @@ import (
 type authenticatedHandler func(http.ResponseWriter, *http.Request, database.User)
 
 func (cfg *apiConfig) middlewareAuth(handler authenticatedHandler) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		apiKey, apiKeyError := auth.GetAPIKey(r.Header)
+	return func(w http.ResponseWriter, request *http.Request) {
+		apiKey, apiKeyError := auth.GetAPIKey(request.Header)
 
 		if apiKeyError != nil {
-			respondWithError(w, 403, fmt.Sprint("Auth error: ", apiKeyError))
+			respondWithError(w, 403, fmt.Sprintln("Auth error: ", apiKeyError))
 
-			cfg.DB.GetUserByAPIKey(r.Context(), apiKey)
+			cfg.DB.GetUserByAPIKey(request.Context(), apiKey)
 		}
 
-		user, getUserError := cfg.DB.GetUserByAPIKey(r.Context(), apiKey)
+		user, getUserError := cfg.DB.GetUserByAPIKey(request.Context(), apiKey)
 
 		if getUserError != nil {
-			respondWithError(w, 400, fmt.Sprint("Error retrieving user: ", getUserError))
+			respondWithError(w, 400, fmt.Sprintln("Error retrieving user: ", getUserError))
 			return
 		}
 
-		handler(w, r, user)
+		handler(w, request, user)
 	}
 }
