@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/cors"
@@ -34,9 +35,12 @@ func main() {
 		log.Fatal("Error connecting to database: ", sqlError)
 	}
 
+	db := database.New(sqlConnection)
 	apiConfiguration := apiConfig{
-		DB: database.New(sqlConnection),
+		DB: db,
 	}
+
+	go startScraping(db, 10, time.Minute)
 
 	portString := os.Getenv("PORT")
 	if portString == "" {
