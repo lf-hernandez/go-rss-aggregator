@@ -22,7 +22,7 @@ func (apiConfiguration *apiConfig) handlerCreateFeed(responseWriter http.Respons
 	decoderError := decoder.Decode(&params)
 
 	if decoderError != nil {
-		respondWithError(responseWriter, 400, fmt.Sprintln("Error parsing JSON: %v", decoderError))
+		respondWithError(responseWriter, 400, fmt.Sprintln("Error parsing JSON:", decoderError))
 		return
 	}
 
