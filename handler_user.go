@@ -43,3 +43,18 @@ func (apiConfiguration *apiConfig) handlerCreateUser(responseWriter http.Respons
 func (apiConfiguration *apiConfig) handlerGetUser(responseWriter http.ResponseWriter, request *http.Request, user database.User) {
 	respondWithJSON(responseWriter, 200, databaseUserToUser(user))
 }
+
+func (apiConfiguration *apiConfig) handlerGetPostsByUser(responseWriter http.ResponseWriter, request *http.Request, user database.User) {
+	posts, getPostsDBError := apiConfiguration.DB.GetPostsByUser(request.Context(), database.GetPostsByUserParams{
+		UserID: user.ID,
+		Limit:  10,
+	})
+
+	if getPostsDBError != nil {
+		respondWithError(responseWriter, 400, fmt.Sprintf("Couln't get posts: %v", getPostsDBError))
+		return
+	}
+
+	respondWithJSON(responseWriter, 200, databasePostsToPosts(posts))
+
+}

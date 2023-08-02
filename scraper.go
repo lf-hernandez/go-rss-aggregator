@@ -2,17 +2,21 @@ package main
 
 import (
 	"context"
+	"database/sql"
+	"fmt"
 	"log"
+	"strings"
 	"sync"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/lf-hernandez/go-rss-aggregator/internal/database"
 )
 
 func startScraping(db *database.Queries,
 	concurrentUnits int,
 	timeBetweenRequest time.Duration) {
-	log.Printf("Scraping on %v go routines every %s duration", concurrentUnits, timeBetweenRequest)
+	log.Printf("Scraping on %v goroutines ('lightweight threads') every %s", concurrentUnits, timeBetweenRequest)
 	ticker := time.NewTicker(timeBetweenRequest)
 
 	for ; ; <-ticker.C {
@@ -50,7 +54,35 @@ func scrapeFeed(db *database.Queries, wg *sync.WaitGroup, feed database.Feed) {
 	}
 
 	for _, item := range rssFeed.Channel.Item {
-		log.Println("Found post: ", item.Title, "on feed: ", feed.Name)
+		description := sql.NullString{}
+		if item.Description != "" {
+			description.String = item.Description
+			description.Valid = true
+		}
+
+		parsedPubAtDate, err := time.Parse(time.RFC1123Z, item.PubDate)
+		if err != nil {
+			log.Printf("couldn't parse date %v with err %v", item.PubDate, err)
+		}
+
+		_, createPostDbError := db.CreatePost(context.Background(), database.CreatePostParams{
+			ID:          uuid.New(),
+			CreatedAt:   time.Now().UTC(),
+			UpdatedAt:   time.Now().UTC(),
+			Title:       item.Title,
+			Description: description,
+			PublishedAt: parsedPubAtDate,
+			Url:         item.Link,
+			FeedID:      feed.ID,
+		})
+
+		if createPostDbError != nil {
+			if strings.Contains(createPostDbError.Error(), "duplicate key") {
+				continue
+			}
+			fmt.Println("error creating post in database: ", createPostDbError)
+		}
 	}
+
 	log.Printf("Feed %s collected, %v posts found", feed.Name, len(rssFeed.Channel.Item))
 }
