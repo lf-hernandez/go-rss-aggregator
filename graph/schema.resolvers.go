@@ -7,18 +7,56 @@ package graph
 import (
 	"context"
 	"fmt"
+	"strconv"
 
 	"github.com/lf-hernandez/go-rss-aggregator/graph/model"
 )
 
-// CreateTodo is the resolver for the createTodo field.
-func (r *mutationResolver) CreateTodo(ctx context.Context, input model.NewTodo) (*model.Todo, error) {
-	panic(fmt.Errorf("not implemented: CreateTodo - createTodo"))
+// CreateUser is the resolver for the createUser field.
+func (r *mutationResolver) CreateUser(ctx context.Context, input model.CreateUserInput) (*model.User, error) {
+	id := input.ID
+	var user model.User
+	user.Name = input.Name
+
+	n := len(r.Resolver.UserStore)
+	if n == 0 {
+		r.Resolver.UserStore = make(map[string]model.User)
+	}
+
+	if id != nil {
+		_, ok := r.Resolver.UserStore[*id]
+		if !ok {
+			return nil, fmt.Errorf("not found")
+		}
+		r.Resolver.UserStore[*id] = user
+	} else {
+		// generate unique id
+		nid := strconv.Itoa(n + 1)
+		user.ID = nid
+		r.Resolver.UserStore[nid] = user
+	}
+
+	return &user, nil
 }
 
-// Todos is the resolver for the todos field.
-func (r *queryResolver) Todos(ctx context.Context) ([]*model.Todo, error) {
-	panic(fmt.Errorf("not implemented: Todos - todos"))
+// User is the resolver for the user field.
+func (r *queryResolver) User(ctx context.Context, id string) (*model.User, error) {
+	user, ok := r.Resolver.UserStore[id]
+	if !ok {
+		return nil, fmt.Errorf("not found")
+	}
+	return &user, nil
+}
+
+// Users is the resolver for the users field.
+func (r *queryResolver) Users(ctx context.Context) ([]*model.User, error) {
+	users := make([]*model.User, 0)
+	for idx := range r.Resolver.UserStore {
+		user := r.Resolver.UserStore[idx]
+		users = append(users, &user)
+	}
+
+	return users, nil
 }
 
 // Mutation returns MutationResolver implementation.
