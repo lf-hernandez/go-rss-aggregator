@@ -7,9 +7,12 @@ import (
 	"os"
 	"time"
 
+	"github.com/99designs/gqlgen/graphql/handler"
+	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/cors"
 	"github.com/joho/godotenv"
+	"github.com/lf-hernandez/go-rss-aggregator/graph"
 	"github.com/lf-hernandez/go-rss-aggregator/internal/database"
 
 	_ "github.com/lib/pq"
@@ -42,8 +45,8 @@ func main() {
 
 	go startScraping(db, 10, time.Minute)
 
-	portString := os.Getenv("PORT")
-	if portString == "" {
+	port := os.Getenv("PORT")
+	if port == "" {
 		log.Fatal("PORT not found")
 	}
 
@@ -77,12 +80,20 @@ func main() {
 
 	router.Mount("/v1", v1Router)
 
+	v2Router := chi.NewRouter()
+	gqlHandler := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{}}))
+
+	v2Router.Handle("/", playground.Handler("GraphQL playground", "/v2/query"))
+	v2Router.Handle("/query", gqlHandler)
+
+	router.Mount("/v2", v2Router)
+
 	server := &http.Server{
 		Handler: router,
-		Addr:    ":" + portString,
+		Addr:    ":" + port,
 	}
 
-	log.Printf("Server starting on port %v", portString)
+	log.Printf("Server starting on port %v", port)
 
 	serverError := server.ListenAndServe()
 	if serverError != nil {
