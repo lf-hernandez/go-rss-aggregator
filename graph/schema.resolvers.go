@@ -7,34 +7,35 @@ package graph
 import (
 	"context"
 	"fmt"
-	"strconv"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/lf-hernandez/go-rss-aggregator/graph/model"
+	"github.com/lf-hernandez/go-rss-aggregator/internal/database"
 )
 
 // CreateUser is the resolver for the createUser field.
 func (r *mutationResolver) CreateUser(ctx context.Context, input model.CreateUserInput) (*model.User, error) {
-	id := input.ID
-	var user model.User
-	user.Name = input.Name
+	userName := input.Name
 
-	n := len(r.Resolver.UserStore)
-	if n == 0 {
-		r.Resolver.UserStore = make(map[string]model.User)
+	if userName == "" {
+		return nil, fmt.Errorf("invalid input provided")
 	}
 
-	if id != nil {
-		_, ok := r.Resolver.UserStore[*id]
-		if !ok {
-			return nil, fmt.Errorf("not found")
-		}
-		r.Resolver.UserStore[*id] = user
-	} else {
-		// generate unique id
-		nid := strconv.Itoa(n + 1)
-		user.ID = nid
-		r.Resolver.UserStore[nid] = user
+	databaseUser, databaseUserError := r.Database.CreateUser(ctx, database.CreateUserParams{
+		ID:        uuid.New(),
+		CreatedAt: time.Now().UTC(),
+		UpdatedAt: time.Now().UTC(),
+		Name:      userName,
+	})
+
+	if databaseUserError != nil {
+		return nil, fmt.Errorf("error creating user: %v", databaseUserError)
+	}
+
+	user := model.User{
+		ID:   databaseUser.ID.String(),
+		Name: databaseUser.Name,
 	}
 
 	return &user, nil
