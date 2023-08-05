@@ -23,9 +23,10 @@ type apiConfig struct {
 }
 
 func main() {
+
 	dotEnvError := godotenv.Load()
 	if dotEnvError != nil {
-		log.Fatal("Error loading .env file")
+		log.Print(dotEnvError.Error())
 	}
 
 	dbURL := os.Getenv("DB_URL")
@@ -35,7 +36,7 @@ func main() {
 
 	sqlConnection, sqlError := sql.Open("postgres", dbURL)
 	if sqlError != nil {
-		log.Fatal("Error connecting to database: ", sqlError)
+		log.Fatal("error connecting to database: ", sqlError)
 	}
 
 	db := database.New(sqlConnection)
@@ -47,7 +48,8 @@ func main() {
 
 	port := os.Getenv("PORT")
 	if port == "" {
-		log.Fatal("PORT not found")
+		port = "8080"
+		log.Printf("defaulting to port %s", port)
 	}
 
 	router := chi.NewRouter()
@@ -95,7 +97,7 @@ func main() {
 		Addr:    ":" + port,
 	}
 
-	log.Printf("Server starting on port %v", port)
+	log.Printf("server starting on port %v", port)
 
 	serverError := server.ListenAndServe()
 	if serverError != nil {
