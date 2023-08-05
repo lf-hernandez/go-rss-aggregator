@@ -17,6 +17,18 @@ PORT=<some_port_number>
 DB_URL=<some_db_conn_string>
 ```
 
+If running the app from docker, ensure you've built the image from the Dockerfile
+
+```bash
+docker build --tag <some_image_name>
+```
+
+then ensure you pass in the proper env vars when starting the container:
+
+```bash
+docker run -e DB_URL=<SOME_URL> -e PORT=<SOME_PORT> <executable_name>
+```
+
 ### Database Setup
 
 You can run the API againts a container or local instance of Postgres.
@@ -36,4 +48,8 @@ To get your database up to date, apply migrations by `cd`-ing into `sql/migratio
 goose postgres <db_conn_string> up
 ```
 
-This is still a work in progress, for the time being you can test endpoints via HTTPie, curl, or your tool of choice.
+### Testing endpoints
+
+This is still a work in progress, for the time being you can test endpoints via HTTPie, curl, or your tool of choice for v1.
+
+v2 is utilizing a GraphQL API with access to an interactive playground via `/v2/graphql`
