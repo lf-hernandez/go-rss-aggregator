@@ -7,3 +7,12 @@ RETURNING *;
 SELECT *
 FROM users
 WHERE api_key = $1;
+
+-- name: GetUsers :many
+SELECT * 
+FROM users;
+
+-- name: GetUserById :one
+SELECT *
+FROM users
+WHERE id = $1;

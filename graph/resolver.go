@@ -1,6 +1,11 @@
+//go:generate go run github.com/99designs/gqlgen generate
+
 package graph
 
-import "github.com/lf-hernandez/go-rss-aggregator/graph/model"
+import (
+	"github.com/lf-hernandez/go-rss-aggregator/graph/model"
+	"github.com/lf-hernandez/go-rss-aggregator/internal/database"
+)
 
 // This file will not be regenerated automatically.
 //
@@ -8,4 +13,5 @@ import "github.com/lf-hernandez/go-rss-aggregator/graph/model"
 
 type Resolver struct {
 	UserStore map[string]model.User
+	Database  *database.Queries
 }

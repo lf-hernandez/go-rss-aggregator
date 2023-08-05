@@ -19,7 +19,7 @@ import (
 )
 
 type apiConfig struct {
-	DB *database.Queries
+	Database *database.Queries
 }
 
 func main() {
@@ -40,7 +40,7 @@ func main() {
 
 	db := database.New(sqlConnection)
 	apiConfiguration := apiConfig{
-		DB: db,
+		Database: db,
 	}
 
 	go startScraping(db, 10, time.Minute)
@@ -81,7 +81,9 @@ func main() {
 	router.Mount("/v1", v1Router)
 
 	v2Router := chi.NewRouter()
-	gqlHandler := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{}}))
+	gqlHandler := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{
+		Database: db,
+	}}))
 
 	v2Router.Handle("/", playground.Handler("GraphQL playground", "/v2/query"))
 	v2Router.Handle("/query", gqlHandler)

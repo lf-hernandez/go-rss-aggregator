@@ -17,10 +17,10 @@ func (cfg *apiConfig) middlewareAuth(handler authenticatedHandler) http.HandlerF
 		if apiKeyError != nil {
 			respondWithError(w, 403, fmt.Sprintln("Auth error: ", apiKeyError))
 
-			cfg.DB.GetUserByAPIKey(request.Context(), apiKey)
+			cfg.Database.GetUserByAPIKey(request.Context(), apiKey)
 		}
 
-		user, getUserError := cfg.DB.GetUserByAPIKey(request.Context(), apiKey)
+		user, getUserError := cfg.Database.GetUserByAPIKey(request.Context(), apiKey)
 
 		if getUserError != nil {
 			respondWithError(w, 400, fmt.Sprintln("Error retrieving user: ", getUserError))

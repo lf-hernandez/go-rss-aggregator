@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/google/uuid"
 	"github.com/lf-hernandez/go-rss-aggregator/graph/model"
 )
 
@@ -41,18 +42,36 @@ func (r *mutationResolver) CreateUser(ctx context.Context, input model.CreateUse
 
 // User is the resolver for the user field.
 func (r *queryResolver) User(ctx context.Context, id string) (*model.User, error) {
-	user, ok := r.Resolver.UserStore[id]
-	if !ok {
-		return nil, fmt.Errorf("not found")
+	parsedStringUUID, parsingErr := uuid.Parse(id)
+
+	if parsingErr != nil {
+		return nil, fmt.Errorf("user not found")
+	}
+
+	databaseUser, databaseUserError := r.Resolver.Database.GetUserById(ctx, parsedStringUUID)
+
+	if databaseUserError != nil {
+		return nil, fmt.Errorf("error fetching users: %v", databaseUserError)
+	}
+
+	user := model.User{
+		ID:   databaseUser.ID.String(),
+		Name: databaseUser.Name,
 	}
 	return &user, nil
 }
 
 // Users is the resolver for the users field.
 func (r *queryResolver) Users(ctx context.Context) ([]*model.User, error) {
+	databaseUsers, databaseUserError := r.Resolver.Database.GetUsers(ctx)
+
+	if databaseUserError != nil {
+		return nil, fmt.Errorf("error fetching users: %v", databaseUserError)
+	}
+
 	users := make([]*model.User, 0)
-	for idx := range r.Resolver.UserStore {
-		user := r.Resolver.UserStore[idx]
+	for _, dbUser := range databaseUsers {
+		user := model.User{ID: dbUser.ID.String(), Name: dbUser.Name}
 		users = append(users, &user)
 	}
 
