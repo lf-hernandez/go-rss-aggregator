@@ -87,7 +87,7 @@ func main() {
 		Database: db,
 	}}))
 
-	v2Router.Handle("/", playground.Handler("GraphQL playground", "/v2/query"))
+	v2Router.Handle("/graphql", playground.Handler("GraphQL playground", "/v2/query"))
 	v2Router.Handle("/query", gqlHandler)
 
 	router.Mount("/v2", v2Router)
