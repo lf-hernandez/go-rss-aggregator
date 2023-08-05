@@ -25,7 +25,7 @@ func (apiConfiguration *apiConfig) handlerCreateUser(responseWriter http.Respons
 		return
 	}
 
-	user, createUserError := apiConfiguration.DB.CreateUser(request.Context(), database.CreateUserParams{
+	user, createUserError := apiConfiguration.Database.CreateUser(request.Context(), database.CreateUserParams{
 		ID:        uuid.New(),
 		CreatedAt: time.Now().UTC(),
 		UpdatedAt: time.Now().UTC(),
@@ -45,7 +45,7 @@ func (apiConfiguration *apiConfig) handlerGetUser(responseWriter http.ResponseWr
 }
 
 func (apiConfiguration *apiConfig) handlerGetPostsByUser(responseWriter http.ResponseWriter, request *http.Request, user database.User) {
-	posts, getPostsDBError := apiConfiguration.DB.GetPostsByUser(request.Context(), database.GetPostsByUserParams{
+	posts, getPostsDBError := apiConfiguration.Database.GetPostsByUser(request.Context(), database.GetPostsByUserParams{
 		UserID: user.ID,
 		Limit:  10,
 	})

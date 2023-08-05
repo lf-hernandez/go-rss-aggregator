@@ -26,7 +26,7 @@ func (apiConfiguration *apiConfig) handlerCreateFeed(responseWriter http.Respons
 		return
 	}
 
-	feed, createFeedError := apiConfiguration.DB.CreateFeed(request.Context(), database.CreateFeedParams{
+	feed, createFeedError := apiConfiguration.Database.CreateFeed(request.Context(), database.CreateFeedParams{
 		ID:        uuid.New(),
 		CreatedAt: time.Now().UTC(),
 		UpdatedAt: time.Now().UTC(),
@@ -44,7 +44,7 @@ func (apiConfiguration *apiConfig) handlerCreateFeed(responseWriter http.Respons
 }
 
 func (apiConfiguration *apiConfig) handlerGetFeeds(responseWriter http.ResponseWriter, request *http.Request) {
-	feeds, getFeedsError := apiConfiguration.DB.GetFeeds(request.Context())
+	feeds, getFeedsError := apiConfiguration.Database.GetFeeds(request.Context())
 	if getFeedsError != nil {
 		respondWithError(responseWriter, 400, fmt.Sprintln("Couldn't get feeds:, ", getFeedsError))
 		return

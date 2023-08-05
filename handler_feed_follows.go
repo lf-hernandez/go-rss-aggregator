@@ -26,7 +26,7 @@ func (apiConfiguration *apiConfig) handlerCreateFeedFollow(responseWriter http.R
 		return
 	}
 
-	feedFollow, createFeedError := apiConfiguration.DB.CreateFeedFollow(request.Context(), database.CreateFeedFollowParams{
+	feedFollow, createFeedError := apiConfiguration.Database.CreateFeedFollow(request.Context(), database.CreateFeedFollowParams{
 		ID:        uuid.New(),
 		CreatedAt: time.Now().UTC(),
 		UpdatedAt: time.Now().UTC(),
@@ -43,7 +43,7 @@ func (apiConfiguration *apiConfig) handlerCreateFeedFollow(responseWriter http.R
 }
 
 func (apiConfiguration *apiConfig) handlerGetFeedFollows(responseWriter http.ResponseWriter, request *http.Request, authenticatedUser database.User) {
-	feedFollows, getFeedsError := apiConfiguration.DB.GetFeedFollows(request.Context(), authenticatedUser.ID)
+	feedFollows, getFeedsError := apiConfiguration.Database.GetFeedFollows(request.Context(), authenticatedUser.ID)
 	if getFeedsError != nil {
 		respondWithError(responseWriter, 400, fmt.Sprintln("Couldn't get feeds follows, ", getFeedsError))
 		return
@@ -59,7 +59,7 @@ func (apiCfg *apiConfig) handlerDeleteFeedFollow(responseWriter http.ResponseWri
 		respondWithError(responseWriter, 400, fmt.Sprintln("Couldn't parse feed follow id: ", uuidParsingError))
 	}
 
-	databaseDeleteError := apiCfg.DB.DeleteFeedFollow(request.Context(), database.DeleteFeedFollowParams{
+	databaseDeleteError := apiCfg.Database.DeleteFeedFollow(request.Context(), database.DeleteFeedFollowParams{
 		ID:     feedFollowID,
 		UserID: authenticatedUser.ID,
 	})
