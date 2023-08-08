@@ -1,0 +1,33 @@
+version: '3'
+
+services:
+  postgres-db-server:
+    container_name: docker_postgres
+    image: 'postgres:15.3'
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-db:/var/lib/postgresql/data
+    networks:
+      - rssagg-net
+  go-api-server:
+    build: .
+    env_file:
+      - .env
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres-db-server
+    networks:
+      - rssagg-net
+
+volumes:
+  postgres-db:
+
+networks:
+  rssagg-net:
+    driver: bridge
