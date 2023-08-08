@@ -29,6 +29,12 @@ then ensure you pass in the proper env vars when starting the container:
 docker run -e DB_URL=<SOME_URL> -e PORT=<SOME_PORT> <executable_name>
 ```
 
+Alternatively you can run the entire application (including Postgres) via Docker compose
+
+```bash
+docker compose up
+```
+
 ### Database Setup
 
 You can run the API againts a container or local instance of Postgres.
