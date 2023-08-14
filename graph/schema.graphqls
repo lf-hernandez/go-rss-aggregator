@@ -3,15 +3,55 @@ type User {
   name: String!
 }
 
+type Feed {
+  id: String!
+  name: String!
+  url: String!
+}
+
+type FeedFollow {
+  id: String!
+  feed: Feed!
+  user: User!
+}
+
+type Post {
+  id: String!
+  title: String!
+  description: String
+  publishedAt: String
+  url: String!
+}
+
 type Query {
   user(id: String!): User
   users: [User!]!
+  feed(id: String!): Feed
+  feeds: [Feed!]!
+  feedFollows(userId: String!): [FeedFollow!]!
+  post(id: String!): Post
+  posts: [Post!]!
+  postsByUser(userId: String!): [Post!]!
 }
 
 input CreateUserInput {
   name: String!
 }
 
+input CreateFeedInput {
+  name: String!
+  url: String!
+  userId: String!
+}
+
+input CreateFeedFollowInput {
+  feedId: String!
+  userId: String!
+} 
+
 type Mutation {
   createUser(input: CreateUserInput!): User!
+  createFeed(input: CreateFeedInput!): Feed!
+  createFeedFollow(input: CreateFeedFollowInput): FeedFollow!
 }
+
