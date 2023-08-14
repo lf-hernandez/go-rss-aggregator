@@ -8,6 +8,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/lf-hernandez/go-rss-aggregator/internal/database"
+	"github.com/lf-hernandez/go-rss-aggregator/models"
 )
 
 func (apiConfiguration *apiConfig) handlerCreateUser(responseWriter http.ResponseWriter, request *http.Request) {
@@ -37,11 +38,11 @@ func (apiConfiguration *apiConfig) handlerCreateUser(responseWriter http.Respons
 		return
 	}
 
-	respondWithJSON(responseWriter, 201, databaseUserToUser(user))
+	respondWithJSON(responseWriter, 201, models.DatabaseUserToUser(user))
 }
 
 func (apiConfiguration *apiConfig) handlerGetUser(responseWriter http.ResponseWriter, request *http.Request, user database.User) {
-	respondWithJSON(responseWriter, 200, databaseUserToUser(user))
+	respondWithJSON(responseWriter, 200, models.DatabaseUserToUser(user))
 }
 
 func (apiConfiguration *apiConfig) handlerGetPostsByUser(responseWriter http.ResponseWriter, request *http.Request, user database.User) {
@@ -55,6 +56,6 @@ func (apiConfiguration *apiConfig) handlerGetPostsByUser(responseWriter http.Res
 		return
 	}
 
-	respondWithJSON(responseWriter, 200, databasePostsToPosts(posts))
+	respondWithJSON(responseWriter, 200, models.DatabasePostsToPosts(posts))
 
 }

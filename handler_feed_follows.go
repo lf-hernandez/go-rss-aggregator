@@ -9,6 +9,7 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/google/uuid"
 	"github.com/lf-hernandez/go-rss-aggregator/internal/database"
+	"github.com/lf-hernandez/go-rss-aggregator/models"
 )
 
 func (apiConfiguration *apiConfig) handlerCreateFeedFollow(responseWriter http.ResponseWriter, request *http.Request, authenticatedUser database.User) {
@@ -39,7 +40,7 @@ func (apiConfiguration *apiConfig) handlerCreateFeedFollow(responseWriter http.R
 		return
 	}
 
-	respondWithJSON(responseWriter, 201, databaseFeedFollowToFeedFollow(feedFollow))
+	respondWithJSON(responseWriter, 201, models.DatabaseFeedFollowToFeedFollow(feedFollow))
 }
 
 func (apiConfiguration *apiConfig) handlerGetFeedFollows(responseWriter http.ResponseWriter, request *http.Request, authenticatedUser database.User) {
@@ -49,7 +50,7 @@ func (apiConfiguration *apiConfig) handlerGetFeedFollows(responseWriter http.Res
 		return
 	}
 
-	respondWithJSON(responseWriter, 200, databaseFeedFollowsToFeedFollows(feedFollows))
+	respondWithJSON(responseWriter, 200, models.DatabaseFeedFollowsToFeedFollows(feedFollows))
 }
 
 func (apiCfg *apiConfig) handlerDeleteFeedFollow(responseWriter http.ResponseWriter, request *http.Request, authenticatedUser database.User) {
