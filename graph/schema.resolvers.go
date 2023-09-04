@@ -72,7 +72,7 @@ func (r *mutationResolver) CreateFeed(ctx context.Context, input model.CreateFee
 
 // CreateFeedFollow is the resolver for the createFeedFollow field.
 func (r *mutationResolver) CreateFeedFollow(ctx context.Context, input *model.CreateFeedFollowInput) (*model.FeedFollow, error) {
-	feedId, userId := input.UserID, input.FeedID
+	userId, feedId := input.UserID, input.FeedID
 	if feedId == "" || userId == "" {
 		return nil, fmt.Errorf("invalid input provided")
 	}
